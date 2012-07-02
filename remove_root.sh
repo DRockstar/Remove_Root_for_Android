@@ -1,6 +1,6 @@
 #!/sbin/sh
 # remove_root.sh script written by DRockstar for Team Epic
-# version 2 2012-06-30
+# version 3 2012-07-03
 
 # designed to remove all known files used in rooting Android devices
 # this script can be used from terminal, or  updater-script from recovery
@@ -33,8 +33,12 @@ BUSYBOX_PROGRESS="0.8";
 # List of root files to remove
 # Please feel free to contribute to this list
 FILES="
+/data/app/com.noshufou.android.su.apk
+/data/app/com.noshufou.android.su-1.apk
+/data/app/com.noshufou.android.su-2.apk
 /data/dalvik-cache/system@app@rootperm.apk@classes.dex
 /data/dalvik-cache/system@app@Superuser.apk@classes.dex
+/data/data/com.noshufou.android.su
 /data/local/root.sh
 /data/local/tmp/rageagainstthecage-arm5.bin
 /etc/group
@@ -68,6 +72,7 @@ FILES_TO_RENAME="
 CUT="$BUSYBOX cut";
 FIND="$BUSYBOX find";
 GREP="$BUSYBOX grep";
+MOUNT="$BUSYBOX mount";
 MV="$BUSYBOX mv -f";
 PS="$BUSYBOX ps";
 READLINK="$BUSYBOX readlink";
@@ -129,6 +134,11 @@ remove_busybox() {
   done;
   set_progress $BUSYBOX_PROGRESS;
 }
+
+ui_print "Mounting /system and /data read/write...";
+for MOUNTS in /system /data; do
+  $MOUNT -o remount,rw $MOUNTS;
+done
 
 case $1 in
 "root") remove_root;;

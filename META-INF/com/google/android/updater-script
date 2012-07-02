@@ -1,4 +1,4 @@
-ui_print("Team Epic's Remove Root from Recovery v2");
+ui_print("Team Epic's Remove Root from Recovery v3");
 ui_print("Mounting system...");
 run_program("/sbin/mount", "/system");
 set_progress(0.10);
