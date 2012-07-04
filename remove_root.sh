@@ -6,6 +6,10 @@
 # this script can be used from terminal, or  updater-script from recovery
 # Copyright (C) 2012 Donovan Bartish
 
+# USAGE: remove_root.sh -b {busybox binary} -p {0.0 to 1.0}
+# -b: location of busybox binary for script to use
+# -p: set recovery progress bar (0.0 to 1.0) after end of script
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -23,12 +27,8 @@
 BUSYBOX="/tmp/busybox";
 
 # Set the recovery ui progress bar percentage level
-# after removing root
-ROOT_PROGRESS="0.5";
-
-# Set the recovery ui progress bar percentage level
-# after removing busybox
-BUSYBOX_PROGRESS="0.8";
+# after running script
+PROGRESSBAR="0.5";
 
 # List of root files to remove
 # Please feel free to contribute to this list
@@ -70,6 +70,7 @@ FILES_TO_RENAME="
 
 # Busybox shortcut variables
 CUT="$BUSYBOX cut";
+EXPR="$BUSYBOX expr";
 FIND="$BUSYBOX find";
 GREP="$BUSYBOX grep";
 MOUNT="$BUSYBOX mount";
@@ -79,6 +80,9 @@ READLINK="$BUSYBOX readlink";
 RM="$BUSYBOX rm -rf";
 SED="$BUSYBOX sed";
 TEST="$BUSYBOX test";
+
+# Give busybox permissions, just in case
+chmod 755 $BUSYBOX;
 
 # Get file descriptor for recovery ui output
 # Original Credit to Chainfire for recovery ui output script
@@ -112,7 +116,6 @@ remove_root() {
       $MV $FILE `echo $FILE | $SED 's/.bak//'`;
     fi;
   done;
-  set_progress $ROOT_PROGRESS;
 }
 
 # Remove all busybox installations in /system
@@ -132,7 +135,6 @@ remove_busybox() {
       fi;
     done;
   done;
-  set_progress $BUSYBOX_PROGRESS;
 }
 
 ui_print "Mounting /system and /data read/write...";
@@ -140,8 +142,24 @@ for MOUNTS in /system /data; do
   $MOUNT -o remount,rw $MOUNTS;
 done
 
+while getopts b:p:o: O; do
+  case $O in
+    b) BUSYBOX=$OPTARG;;
+    p) PROGRESSBAR=$OPTARG;;
+    o) OPTION=$OPTARG;;
+  esac;
+done;
+shift `$EXPR $OPTIND - 1`;
+
 case $1 in
+"root") OPTION="root";;
+"busybox") OPTION="busybox";;
+esac;
+
+case $OPTION in
 "root") remove_root;;
 "busybox") remove_busybox;;
 *) remove_root; remove_busybox;;
 esac;
+
+set_progress $PROGRESSBAR;

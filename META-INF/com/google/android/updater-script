@@ -11,7 +11,9 @@ set_perm(0, 0, 0755, "/tmp/remove_root.sh");
 set_progress(0.20);
 
 ui_print("Running Script");
-run_program("/tmp/remove_root.sh");
+# options: -b {location of busybox binary}
+# options: -p {progress percentage to be set after script succeeds}
+run_program("/tmp/remove_root.sh", "-b", "/tmp/busybox", "-p", "0.8");
 
 ui_print("Unmounting system...");
 run_program("/sbin/umount", "/system");
