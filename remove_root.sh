@@ -1,6 +1,6 @@
 #!/sbin/sh
 # remove_root.sh script written by DRockstar for Team Epic
-# version 3 2012-07-03
+# version 5 2012-07-21
 
 # designed to remove all known files used in rooting Android devices
 # this script can be used from terminal, or  updater-script from recovery
@@ -39,8 +39,16 @@ FILES="
 /data/dalvik-cache/system@app@rootperm.apk@classes.dex
 /data/dalvik-cache/system@app@Superuser.apk@classes.dex
 /data/data/com.noshufou.android.su
+/data/local/mempodroid
+/data/local/n95-offsets
+/data/local/rageagainstthecage-arm5.bin
 /data/local/root.sh
+/data/local/zergRush
+/data/local/tmp/mempodroid
+/data/local/tmp/n95-offsets
 /data/local/tmp/rageagainstthecage-arm5.bin
+/data/local/tmp/root.sh
+/data/local/tmp/zergRush
 /etc/group
 /etc/passwd
 /etc/resolv.conf
@@ -59,13 +67,6 @@ FILES="
 /data/local/timer_delay
 /system/bin/recoveryres
 /system/bin/recoveryfiles
-";
-
-# List of files to rename to original, each with .bak extension
-# Please feel free to contribute to this list
-FILES_TO_RENAME="
-/system/etc/install-recovery.sh.bak
-/system/recovery-from-boot.p.bak
 ";
 
 # Busybox shortcut variables
@@ -106,15 +107,13 @@ ui_print() {
 }
 
 # Remove all root files listed in $FILES
-# Rename all files to original names in $FILES_TO_RENAME
+# Searches /system for .bak files and renames them back to original file names
 remove_root() {
   ui_print "Removing all root files...";
   for ROOTFILE in $FILES; do $RM $ROOTFILE; done;
   ui_print "Renaming .bak files to originals...";
-  for FILE in $FILES_TO_RENAME; do
-    if $TEST -f $FILE; then
-      $MV $FILE `echo $FILE | $SED 's/.bak//'`;
-    fi;
+  for FILE in `$FIND /system -name *.bak`; do
+    $MV $FILE `echo $FILE | $SED 's/.bak//'`;
   done;
 }
 
